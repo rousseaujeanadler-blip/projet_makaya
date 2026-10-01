@@ -30,17 +30,16 @@ function MainApp() {
       <Header onOpenDonate={handleOpenDonate} />
       <main>
         <Hero onOpenDonate={handleOpenDonate} />
+        <Mission />
         <Pillars />
-        <Gallery />
-        <Mission onOpenDonate={handleOpenDonate} />
-        <ImpactStats onOpenDonate={handleOpenDonate} />
+        <Programs />
         <HaitiMap />
-        <Programs onOpenDonate={handleOpenDonate} />
+        <ImpactStats />
+        <Gallery />
         <Team />
-        
         <Video />
-        <Faq />
         <News />
+        <Faq />
         <Contact />
       </main>
       <Footer />

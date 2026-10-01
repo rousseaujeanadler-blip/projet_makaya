@@ -27,16 +27,19 @@ export default function Gallery() {
       <div className="gallery-shell reveal">
         <div className="gallery-topline">
           <p className="gallery-mark">✳ <span>MAKAYA</span></p>
-          <a href="#contact">Nous contacter <span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
+          <a href="#contact">
+            {galleryT.topCtaText || "Nous contacter"}{" "}
+            <span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+          </a>
         </div>
 
-        <div className="gallery-mosaic" aria-label="Galerie de nos activités">
+        <div className="gallery-mosaic" aria-label={galleryT.title || "Galerie de nos activités"}>
           {mosaicItems.map(({ slide, index }, itemIndex) => (
             <button
               className={`gallery-tile tile-${itemIndex + 1}`}
               key={`${slide.caption}-${itemIndex}`}
               onClick={() => setLightboxIndex(index)}
-              aria-label={`Agrandir : ${slide.alt}`}
+              aria-label={`${galleryT.lightbox?.zoom || "Agrandir :"} ${slide.alt}`}
             >
               <img src={slide.src} alt={slide.alt} />
               <span className="material-symbols-rounded" aria-hidden="true">zoom_in</span>
@@ -45,23 +48,44 @@ export default function Gallery() {
         </div>
 
         <div className="gallery-bottomline">
-          <h2><span>Nos</span> instants<br />partagés</h2>
+          <h2>{galleryT.bottomTitleLeft || "Nos instants partagés"}</h2>
           <div>
             <p>{galleryT.lead}</p>
-            <a className="gallery-cta" href="#contact">Découvrir nos actions <span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span></a>
+            <a className="gallery-cta" href="#contact">
+              {galleryT.bottomCtaText || "Découvrir nos actions"}{" "}
+              <span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+            </a>
           </div>
-          <h2 className="gallery-bottom-right">au cœur des<br /><span>communautés</span></h2>
+          <h2 className="gallery-bottom-right">{galleryT.bottomTitleRight || "au cœur des communautés"}</h2>
         </div>
       </div>
 
       {lightboxIndex !== null && (
         <div className="lightbox-backdrop" onClick={() => setLightboxIndex(null)}>
           <div className="lightbox-modal" onClick={(event) => event.stopPropagation()}>
-            <button className="lightbox-close" onClick={() => setLightboxIndex(null)} aria-label="Fermer"><span className="material-symbols-rounded" aria-hidden="true">close</span></button>
+            <button
+              className="lightbox-close"
+              onClick={() => setLightboxIndex(null)}
+              aria-label={galleryT.lightbox?.close || "Fermer"}
+            >
+              <span className="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
             <img src={galleryT.slides[lightboxIndex].src} alt={galleryT.slides[lightboxIndex].alt} className="lightbox-img" />
             <div className="lightbox-caption"><p>{galleryT.slides[lightboxIndex].caption}</p></div>
-            <button className="lightbox-nav prev" onClick={() => setLightboxIndex((lightboxIndex - 1 + galleryT.slides.length) % galleryT.slides.length)} aria-label="Photo précédente"><span className="material-symbols-rounded" aria-hidden="true">arrow_back</span></button>
-            <button className="lightbox-nav next" onClick={() => setLightboxIndex((lightboxIndex + 1) % galleryT.slides.length)} aria-label="Photo suivante"><span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span></button>
+            <button
+              className="lightbox-nav prev"
+              onClick={() => setLightboxIndex((lightboxIndex - 1 + galleryT.slides.length) % galleryT.slides.length)}
+              aria-label={galleryT.lightbox?.prev || "Photo précédente"}
+            >
+              <span className="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+            </button>
+            <button
+              className="lightbox-nav next"
+              onClick={() => setLightboxIndex((lightboxIndex + 1) % galleryT.slides.length)}
+              aria-label={galleryT.lightbox?.next || "Photo suivante"}
+            >
+              <span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+            </button>
           </div>
         </div>
       )}

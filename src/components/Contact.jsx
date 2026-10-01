@@ -30,7 +30,7 @@ export default function Contact() {
       !formData.message.trim()
     ) {
       showToast(
-        "Veuillez remplir le nom, le message et au moins un moyen de contact.",
+        formT.errorMsg || "Veuillez remplir le nom, le message et au moins un moyen de contact.",
         "error"
       );
       return;
@@ -45,6 +45,7 @@ export default function Contact() {
 
   return (
     <section className="contact-section" id="contact">
+      <span id="opportunites" className="visually-hidden-anchor" />
       {/* ── Hero banner ── */}
       <div className="contact-hero">
         <div className="contact-hero-overlay" aria-hidden="true" />
@@ -60,10 +61,10 @@ export default function Contact() {
 
         {/* Left col — info */}
         <aside className="contact-info reveal">
-          <h3 className="contact-info-heading">Nous contacter</h3>
+          <h3 className="contact-info-heading">{contactT.infoTitle || "Nous contacter"}</h3>
           <p className="contact-info-lead">
-            Notre équipe reste à votre écoute pour toute question, proposition de
-            partenariat ou demande d'information.
+            {contactT.infoLead ||
+              "Notre équipe reste à votre écoute pour toute question, proposition de partenariat ou demande d'information."}
           </p>
 
           <div className="contact-meta-list">
@@ -72,7 +73,7 @@ export default function Contact() {
                 location_on
               </span>
               <div>
-                <strong>Localisation</strong>
+                <strong>{contactT.labels?.location || "Localisation"}</strong>
                 <span>{contactT.location}</span>
               </div>
             </div>
@@ -82,7 +83,7 @@ export default function Contact() {
                 phone
               </span>
               <div>
-                <strong>Téléphone / WhatsApp</strong>
+                <strong>{contactT.labels?.phone || "Téléphone / WhatsApp"}</strong>
                 <span>{contactT.phone}</span>
               </div>
             </div>
@@ -95,7 +96,7 @@ export default function Contact() {
                 mail
               </span>
               <div>
-                <strong>E-mail</strong>
+                <strong>{contactT.labels?.email || "E-mail"}</strong>
                 <span>{contactT.email}</span>
               </div>
             </a>
@@ -141,7 +142,7 @@ export default function Contact() {
         {/* Right col — form */}
         <div className="contact-form-wrap reveal">
           <form onSubmit={handleSubmit} className="contact-form-card" noValidate>
-            <h3 className="contact-form-title">Envoyez-nous un message</h3>
+            <h3 className="contact-form-title">{formT.title || "Envoyez-nous un message"}</h3>
 
             <div className="contact-form-group">
               <label htmlFor="c-name">{formT.nameLabel} *</label>
@@ -150,7 +151,7 @@ export default function Contact() {
                 name="name"
                 type="text"
                 required
-                placeholder="Ex: Jean Dupont"
+                placeholder={formT.placeholders?.name || "Ex: Jean Dupont"}
                 value={formData.name}
                 onChange={handleChange}
               />
@@ -163,7 +164,7 @@ export default function Contact() {
                   id="c-email"
                   name="email"
                   type="email"
-                  placeholder="jean.dupont@email.com"
+                  placeholder={formT.placeholders?.email || "jean.dupont@email.com"}
                   value={formData.email}
                   onChange={handleChange}
                 />
@@ -174,7 +175,7 @@ export default function Contact() {
                   id="c-phone"
                   name="phone"
                   type="tel"
-                  placeholder="+509 37XX XXXX"
+                  placeholder={formT.placeholders?.phone || "+509 37XX XXXX"}
                   value={formData.phone}
                   onChange={handleChange}
                 />
@@ -204,7 +205,7 @@ export default function Contact() {
                 name="message"
                 rows="4"
                 required
-                placeholder="Comment désirez-vous participer ou soutenir MAKAYA ?"
+                placeholder={formT.placeholders?.message || "Comment désirez-vous participer ou soutenir MAKAYA ?"}
                 value={formData.message}
                 onChange={handleChange}
               />
@@ -215,7 +216,7 @@ export default function Contact() {
               className="btn btn-primary contact-submit-btn"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Envoi en cours…" : formT.submitBtn}
+              {isSubmitting ? (formT.sending || "Envoi en cours…") : formT.submitBtn}
             </button>
           </form>
         </div>

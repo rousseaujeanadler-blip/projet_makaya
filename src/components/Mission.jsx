@@ -1,6 +1,6 @@
 import { useLanguage } from "./LanguageContext.jsx";
 
-export default function Mission({ onOpenDonate }) {
+export default function Mission() {
   const { t } = useLanguage();
   const missionT = t.mission;
 
@@ -12,22 +12,22 @@ export default function Mission({ onOpenDonate }) {
           <div className="mission-event-visual reveal">
             <div className="mission-photo-frame">
               <img
-                src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85"
-                alt="Enfants et éducation communautaire en Haïti"
+                src={missionT.image || "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85"}
+                alt={missionT.imageAlt || "Enfants et éducation communautaire en Haïti"}
                 className="mission-main-img"
               />
               <div className="mission-watermark-txt" aria-hidden="true">
-                HOPE
+                {missionT.watermark || "HOPE"}
               </div>
             </div>
           </div>
 
-          {/* Right: Content + Quick Donation options */}
+          {/* Right: Content + Core Values & Actions */}
           <div className="mission-event-content reveal">
-            <p className="eyebrow">{missionT.eyebrow || "ACTION D'URGENCE"}</p>
+            <p className="eyebrow">{missionT.eyebrow || "À PROPOS DE MAKAYA"}</p>
             <h2 className="mission-event-title">
-              Une action essentielle <br />
-              <span className="accent-word">pour les communautés</span>
+              {missionT.h2Line1 || "Une action essentielle"} <br />
+              <span className="accent-word">{missionT.h2Accent || "pour les communautés"}</span>
             </h2>
             <div className="title-accent-bar" aria-hidden="true" />
             <p className="mission-event-desc">{missionT.text}</p>
@@ -36,26 +36,30 @@ export default function Mission({ onOpenDonate }) {
                 "Le changement durable naît lorsque les communautés sont écoutées et actrices de leur avenir."}
             </p>
 
-            {/* Quick Donation Widget matching reference */}
-            <div className="mission-quick-donate">
-              <span className="quick-donate-label">Faire un don rapide :</span>
-              <div className="quick-amounts-row">
-                <button type="button" className="amount-pill" onClick={onOpenDonate}>
-                  10 $
-                </button>
-                <button type="button" className="amount-pill active" onClick={onOpenDonate}>
-                  25 $
-                </button>
-                <button type="button" className="amount-pill" onClick={onOpenDonate}>
-                  50 $
-                </button>
-                <button type="button" className="amount-pill" onClick={onOpenDonate}>
-                  Autre
-                </button>
+            {/* Core Values & Program Actions */}
+            <div className="mission-highlights-card">
+              <div className="mission-values-grid">
+                {(missionT.values || [
+                  { icon: "verified", text: "Dignité & Droits fondamentaux" },
+                  { icon: "diversity_3", text: "Action ancrée au cœur des communautés" },
+                  { icon: "eco", text: "Résilience & Développement durable" },
+                ]).map((val, idx) => (
+                  <div className="mission-value-item" key={idx}>
+                    <span className="material-symbols-rounded" aria-hidden="true">{val.icon}</span>
+                    <span className="mission-value-text">{val.text}</span>
+                  </div>
+                ))}
               </div>
-              <button className="btn btn-secondary btn-lg" onClick={onOpenDonate}>
-                Faire un don maintenant
-              </button>
+
+              <div className="mission-actions-row">
+                <a href="#programmes" className="btn btn-secondary btn-lg">
+                  <span>{missionT.ctaText || "Découvrir nos programmes"}</span>
+                  <span className="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+                </a>
+                <a href="#contact" className="btn btn-outline-dark btn-lg">
+                  <span>{missionT.contactCta || "Nous contacter"}</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

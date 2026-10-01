@@ -14,7 +14,7 @@ export default function Footer() {
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
-      showToast("Veuillez saisir une adresse e-mail valide.", "error");
+      showToast(footerT.emailError || "Veuillez saisir une adresse e-mail valide.", "error");
       return;
     }
     setIsSubmitting(true);
@@ -67,7 +67,7 @@ export default function Footer() {
             </form>
 
             <div className="footer-lang-wrap">
-              <span>Langue :</span>
+              <span>{footerT.langLabel || "Langue :"}</span>
               <button
                 className={`footer-lang-btn ${lang === "fr" ? "active" : ""}`}
                 onClick={() => setLang("fr")}

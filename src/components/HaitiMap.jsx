@@ -20,11 +20,11 @@ export default function HaitiMap() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!termsAccepted) {
-      showToast("Veuillez accepter les conditions pour continuer.", "error");
+      showToast(formT.termsError || "Veuillez accepter les conditions pour continuer.", "error");
       return;
     }
     if (!name.trim() || !email.trim()) {
-      showToast("Veuillez renseigner votre nom et votre e-mail.", "error");
+      showToast(formT.fieldsError || "Veuillez renseigner votre nom et votre e-mail.", "error");
       return;
     }
     setIsSubmitting(true);
@@ -149,7 +149,7 @@ export default function HaitiMap() {
                   </div>
 
                   <button type="submit" className="btn-submit-quotation" disabled={isSubmitting}>
-                    {isSubmitting ? "Envoi en cours…" : (formT.submitBtn || "Envoyer ma demande")}
+                    {isSubmitting ? (formT.submitting || "Envoi en cours…") : (formT.submitBtn || "Envoyer ma demande")}
                   </button>
                 </form>
               </div>
@@ -223,7 +223,13 @@ export default function HaitiMap() {
             <div className="dark-left-col">
               <div className="coordinator-avatar-wrap">
                 <img
-                  src={`${import.meta.env.BASE_URL}photos/coordinator.png`}
+                  src={
+                    darkT.coordinatorPhoto?.startsWith("http")
+                      ? darkT.coordinatorPhoto
+                      : darkT.coordinatorPhoto?.startsWith("/")
+                      ? `${import.meta.env.BASE_URL}${darkT.coordinatorPhoto.slice(1)}`
+                      : `${import.meta.env.BASE_URL}${darkT.coordinatorPhoto || "photos/coordinator.png"}`
+                  }
                   alt={darkT.coordinatorName || "Coordinateur de terrain MAKAYA"}
                   className="coordinator-avatar"
                   width="140"

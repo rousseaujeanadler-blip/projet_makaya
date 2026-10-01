@@ -7,6 +7,21 @@ export default function Video() {
 
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const renderVideoTitle = () => {
+    if (!videoT.title) return "MAKAYA";
+    if (videoT.titleAccent && videoT.title.includes(videoT.titleAccent)) {
+      const parts = videoT.title.split(videoT.titleAccent);
+      return (
+        <>
+          {parts[0]}
+          <span className="accent-word">{videoT.titleAccent}</span>
+          {parts.slice(1).join(videoT.titleAccent)}
+        </>
+      );
+    }
+    return videoT.title;
+  };
+
   return (
     <section className="video-section" id="publications">
       {/* Section Header */}
@@ -14,7 +29,7 @@ export default function Video() {
         <div className="section-head text-center reveal">
           <p className="eyebrow">{videoT.eyebrow || "RESSOURCES & PUBLICATIONS"}</p>
           <h2 className="video-title">
-            Des ressources pour <span className="accent-word">comprendre & agir</span>.
+            {renderVideoTitle()}
           </h2>
           <div className="title-accent-bar mx-auto" style={{ margin: "16px auto 20px" }} aria-hidden="true" />
           <p className="section-lead">{videoT.text || "Découvrez nos récits de terrain, notes d’information et contenus de sensibilisation."}</p>
@@ -26,15 +41,15 @@ export default function Video() {
         {!isPlaying ? (
           <div className="video-poster-overlay" onClick={() => setIsPlaying(true)}>
             <img
-              src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1600&q=85"
-              alt="Action communautaire MAKAYA"
+              src={videoT.posterImage || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1600&q=85"}
+              alt={videoT.posterAlt || "Action communautaire MAKAYA"}
               className="video-poster-img"
             />
             <div className="video-poster-scrim" />
             <button
               type="button"
               className="video-play-btn"
-              aria-label="Lancer la vidéo"
+              aria-label={videoT.playAria || "Lancer la vidéo"}
             >
               <span className="material-symbols-rounded">play_arrow</span>
             </button>

@@ -39,21 +39,21 @@ export default function DonationModal({ isOpen, onClose }) {
   const currentAmount = customAmount ? parseFloat(customAmount) || 0 : selectedAmount;
 
   const getImpactDescription = (amount) => {
-    if (amount >= 100) return modalT.presetImpacts[100];
-    if (amount >= 50) return modalT.presetImpacts[50];
-    if (amount >= 25) return modalT.presetImpacts[25];
-    if (amount >= 10) return modalT.presetImpacts[10];
-    return "Chaque dollar contribue directement à la distribution de kits et à la formation des communautés.";
+    if (amount >= 100) return modalT.presetImpacts?.[100];
+    if (amount >= 50) return modalT.presetImpacts?.[50];
+    if (amount >= 25) return modalT.presetImpacts?.[25];
+    if (amount >= 10) return modalT.presetImpacts?.[10];
+    return modalT.defaultImpact || modalT.presetImpacts?.[10] || "Chaque dollar soutient directement les actions prioritaires de MAKAYA auprès des familles et des communautés.";
   };
 
   const handleDonateSubmit = async (e) => {
     e.preventDefault();
     if (currentAmount <= 0) {
-      showToast("Veuillez choisir un montant valide.", "error");
+      showToast(modalT.errors?.amount || "Veuillez choisir un montant valide.", "error");
       return;
     }
     if (!donorData.name.trim() || (!donorData.email.trim() && !donorData.phone.trim())) {
-      showToast("Veuillez indiquer au moins votre nom et un moyen de contact (e-mail ou téléphone/WhatsApp).", "error");
+      showToast(modalT.errors?.contact || "Veuillez indiquer au moins votre nom et un moyen de contact (e-mail ou téléphone/WhatsApp).", "error");
       return;
     }
 
@@ -64,7 +64,7 @@ export default function DonationModal({ isOpen, onClose }) {
       email: donorData.email,
       phone: donorData.phone,
       amount: currentAmount,
-      frequency: frequency === "monthly" ? "Mensuel" : "Don Unique",
+      frequency: frequency === "monthly" ? (modalT.summaryLabels?.monthly || "Mensuel") : (modalT.summaryLabels?.once || "Don Unique"),
       paymentMethod: donorData.paymentMethod,
       notes: donorData.notes,
       impact: getImpactDescription(currentAmount),
@@ -86,14 +86,14 @@ export default function DonationModal({ isOpen, onClose }) {
   return (
     <div className="modal-backdrop" onClick={resetAndClose} aria-modal="true" role="dialog">
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={resetAndClose} aria-label="Fermer">
+        <button className="modal-close" onClick={resetAndClose} aria-label={modalT.closeBtn || "Fermer"}>
           <span className="material-symbols-rounded" aria-hidden="true">close</span>
         </button>
 
         {!isSubmitted ? (
           <>
             <div className="modal-header">
-              <span className="badge-pulse"><span className="material-symbols-rounded" aria-hidden="true">favorite</span> Promesse de Don MAKAYA</span>
+              <span className="badge-pulse"><span className="material-symbols-rounded" aria-hidden="true">favorite</span> {modalT.badge || "Promesse de Don MAKAYA"}</span>
               <h2>{modalT.title}</h2>
               <p>{modalT.subtitle}</p>
             </div>
@@ -157,7 +157,7 @@ export default function DonationModal({ isOpen, onClose }) {
               <div className="impact-box">
                 <div className="impact-icon"><span className="material-symbols-rounded" aria-hidden="true">auto_awesome</span></div>
                 <div className="impact-details">
-                  <strong>Impact ({currentAmount} $ {frequency === "monthly" ? "/ mois" : ""}) :</strong>
+                  <strong>{modalT.impactPrefix || "Impact"} ({currentAmount} $ {frequency === "monthly" ? (modalT.monthSuffix || "/ mois") : ""}) :</strong>
                   <p>{getImpactDescription(currentAmount)}</p>
                 </div>
               </div>
@@ -172,7 +172,7 @@ export default function DonationModal({ isOpen, onClose }) {
                     id="donor-name"
                     type="text"
                     required
-                    placeholder="Ex: Marie Joseph"
+                    placeholder={modalT.placeholders?.name || "Ex: Marie Joseph"}
                     value={donorData.name}
                     onChange={(e) => setDonorData({ ...donorData, name: e.target.value })}
                   />
@@ -184,7 +184,7 @@ export default function DonationModal({ isOpen, onClose }) {
                     <input
                       id="donor-email"
                       type="email"
-                      placeholder="marie@gmail.com"
+                      placeholder={modalT.placeholders?.email || "marie@gmail.com"}
                       value={donorData.email}
                       onChange={(e) => setDonorData({ ...donorData, email: e.target.value })}
                     />
@@ -195,7 +195,7 @@ export default function DonationModal({ isOpen, onClose }) {
                     <input
                       id="donor-phone"
                       type="tel"
-                      placeholder="+509 37XX XXXX / WhatsApp"
+                      placeholder={modalT.placeholders?.phone || "+509 37XX XXXX / WhatsApp"}
                       value={donorData.phone}
                       onChange={(e) => setDonorData({ ...donorData, phone: e.target.value })}
                     />
@@ -222,7 +222,7 @@ export default function DonationModal({ isOpen, onClose }) {
                   <textarea
                     id="donor-notes"
                     rows="2"
-                    placeholder="Heure d'appel préférée, questions, etc."
+                    placeholder={modalT.placeholders?.notes || "Heure d'appel préférée, questions, etc."}
                     value={donorData.notes}
                     onChange={(e) => setDonorData({ ...donorData, notes: e.target.value })}
                   ></textarea>
@@ -230,7 +230,7 @@ export default function DonationModal({ isOpen, onClose }) {
               </div>
 
               <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={isSubmitting}>
-                {isSubmitting ? "Transmission à l'équipe MAKAYA..." : `${modalT.paymentBtn} • $${currentAmount}`}
+                {isSubmitting ? (modalT.submitting || "Transmission à l'équipe MAKAYA...") : `${modalT.paymentBtn} • $${currentAmount}`}
               </button>
             </form>
           </>
@@ -240,11 +240,11 @@ export default function DonationModal({ isOpen, onClose }) {
             <h2>{modalT.thankYouTitle}</h2>
             <p>{modalT.thankYouText}</p>
             <div className="donation-summary">
-              <span>Promesse enregistrée : <strong>${currentAmount} ({frequency === "monthly" ? "Mensuel" : "Unique"})</strong></span>
+              <span>{modalT.summaryLabels?.pledge || "Promesse enregistrée :"} <strong>${currentAmount} ({frequency === "monthly" ? (modalT.summaryLabels?.monthly || "Mensuel") : (modalT.summaryLabels?.once || "Unique")})</strong></span>
               <br />
-              <span>Contact : <strong>{donorData.phone || donorData.email}</strong></span>
+              <span>{modalT.summaryLabels?.contact || "Contact :"} <strong>{donorData.phone || donorData.email}</strong></span>
               <br />
-              <span>Mode souhaité : <strong>{donorData.paymentMethod}</strong></span>
+              <span>{modalT.summaryLabels?.mode || "Mode souhaité :"} <strong>{donorData.paymentMethod}</strong></span>
             </div>
             <button className="btn btn-primary" onClick={resetAndClose}>
               {modalT.closeBtn}

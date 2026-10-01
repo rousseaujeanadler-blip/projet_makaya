@@ -7,6 +7,21 @@ export default function Hero({ onOpenDonate }) {
     ? `${import.meta.env.BASE_URL}${heroT.image.slice(1)}`
     : heroT.image;
 
+  const renderTitle = () => {
+    if (!heroT.title) return "MAKAYA";
+    if (heroT.titleAccent && heroT.title.includes(heroT.titleAccent)) {
+      const parts = heroT.title.split(heroT.titleAccent);
+      return (
+        <>
+          {parts[0]}
+          <span className="accent-word">{heroT.titleAccent}</span>
+          {parts.slice(1).join(heroT.titleAccent)}
+        </>
+      );
+    }
+    return heroT.title;
+  };
+
   return (
     <>
       <section
@@ -16,8 +31,9 @@ export default function Hero({ onOpenDonate }) {
       >
         <div className="wrap">
           <div className="hero-content">
+            {heroT.eyebrow && <p className="hero-eyebrow reveal">{heroT.eyebrow}</p>}
             <h1 className="reveal">
-              Ensemble pour <span className="accent-word">l'humanité</span> & l'avenir d'Haïti.
+              {renderTitle()}
             </h1>
 
             <p className="hero-lead reveal">{heroT.lead}</p>
@@ -46,14 +62,17 @@ export default function Hero({ onOpenDonate }) {
       </section>
 
       {/* Partners banner directly below hero as shown in reference design */}
-      <div className="hero-partners-strip">
-        <div className="wrap hero-partners-wrap">
-          <span className="hero-partner-logo">WPF HAITI</span>
-          <span className="hero-partner-logo">AVSI GROUP</span>
-          <span className="hero-partner-logo">MSF SOLIDARITÉ</span>
-          <span className="hero-partner-logo">COMMUNAUTÉS ACTIVES</span>
+      {heroT.partners?.length > 0 && (
+        <div className="hero-partners-strip">
+          <div className="wrap hero-partners-wrap">
+            {heroT.partners.map((partner, idx) => (
+              <span key={idx} className="hero-partner-logo">
+                {partner.label}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

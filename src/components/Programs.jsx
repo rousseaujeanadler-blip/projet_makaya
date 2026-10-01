@@ -1,6 +1,6 @@
 import { useLanguage } from "./LanguageContext.jsx";
 
-export default function Programs({ onOpenDonate }) {
+export default function Programs() {
   const { t } = useLanguage();
   const programsT = t.programs || {};
   const heroT = programsT.hero || {};
@@ -89,13 +89,12 @@ export default function Programs({ onOpenDonate }) {
                   {storyT.text ||
                     "Nous n'avons pas seulement créé une association ; nous avons initié un mouvement solidaire pour redonner le pouvoir d'agir aux populations locales face aux défis humanitaires et climatiques."}
                 </p>
-                <button
-                  type="button"
+                <a
+                  href="#piliers"
                   className="actions-manifesto-link"
-                  onClick={onOpenDonate}
                 >
-                  <span>{storyT.linkText || "Soutenir notre démarche d'action →"}</span>
-                </button>
+                  <span>{storyT.linkText || "Explorer notre démarche d'action →"}</span>
+                </a>
               </div>
 
               {/* Bottom Split Row: Dark Card + White Transparency Card */}
@@ -132,8 +131,14 @@ export default function Programs({ onOpenDonate }) {
             <div className="actions-asym-right">
               <div className="actions-team-photo-wrap">
                 <img
-                  src={`${import.meta.env.BASE_URL}photos/actions-team.png`}
-                  alt="Équipe MAKAYA sur le terrain"
+                  src={
+                    teamPhotoT.src?.startsWith("http")
+                      ? teamPhotoT.src
+                      : teamPhotoT.src?.startsWith("/")
+                      ? `${import.meta.env.BASE_URL}${teamPhotoT.src.slice(1)}`
+                      : `${import.meta.env.BASE_URL}${teamPhotoT.src || "photos/actions-team.png"}`
+                  }
+                  alt={teamPhotoT.alt || "Équipe MAKAYA sur le terrain"}
                   className="actions-team-img"
                   width="440"
                   height="660"
@@ -153,14 +158,13 @@ export default function Programs({ onOpenDonate }) {
           </div>
 
           <div className="actions-bottom-cta">
-            <button
-              type="button"
+            <a
+              href="#contact"
               className="btn btn-primary"
-              onClick={onOpenDonate}
             >
-              <span className="material-symbols-rounded">volunteer_activism</span>
-              <span>{bottomT.cta || "Faire un don pour nos actions"}</span>
-            </button>
+              <span className="material-symbols-rounded">handshake</span>
+              <span>{bottomT.cta || "Rejoindre nos actions de terrain"}</span>
+            </a>
           </div>
         </div>
       </div>

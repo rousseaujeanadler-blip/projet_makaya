@@ -51,7 +51,7 @@ function CountUp({ end, suffix = "+" }) {
   );
 }
 
-export default function ImpactStats({ onOpenDonate }) {
+export default function ImpactStats() {
   const { t } = useLanguage();
   const impactT = t.impact;
 
@@ -81,14 +81,14 @@ export default function ImpactStats({ onOpenDonate }) {
         {/* Campaign Goal Bar */}
         <div className="campaign-banner reveal">
           <div className="campaign-info">
-            <span className="badge-live">● EN COURS</span>
+            <span className="badge-live">{impactT.campaignBadge || "● EN COURS"}</span>
             <h3>{impactT.campaignTitle}</h3>
             <p>{impactT.campaignDesc}</p>
           </div>
           <div className="campaign-progress-wrap">
             <div className="progress-labels">
-              <span>Collecté : <strong>${impactT.raised.toLocaleString()}</strong></span>
-              <span>Objectif : <strong>${impactT.target.toLocaleString()}</strong></span>
+              <span>{impactT.raisedLabel || "Collecté :"} <strong>${impactT.raised.toLocaleString()}</strong></span>
+              <span>{impactT.targetLabel || "Objectif :"} <strong>${impactT.target.toLocaleString()}</strong></span>
             </div>
             <div className="progress-bar-bg">
               <div
@@ -98,9 +98,9 @@ export default function ImpactStats({ onOpenDonate }) {
                 <span className="progress-tip">{impactT.raisedPercent}%</span>
               </div>
             </div>
-            <button className="btn btn-secondary btn-sm" onClick={onOpenDonate}>
-              Contribuer à la campagne
-            </button>
+            <a href="#contact" className="btn btn-secondary btn-sm">
+              {impactT.campaignCta || "Participer à la campagne"}
+            </a>
           </div>
         </div>
       </div>

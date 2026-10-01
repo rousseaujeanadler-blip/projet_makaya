@@ -23,15 +23,50 @@ export default function Header({ onOpenDonate }) {
   const primaryNav = allNav.filter((_, index) => [0, 1, 2, 3, 4, allNav.length - 1].includes(index));
   const moreNav = allNav.filter((_, index) => ![0, 1, 2, 3, 4, allNav.length - 1].includes(index));
 
-  // Detect scroll for sticky header elevation
+  const [activeSection, setActiveSection] = useState("top");
+
+  // Detect scroll for sticky header elevation and scroll spy
   useEffect(() => {
+    const sectionIds = allNav.map((item) => item.href.replace(/^#/, "")).filter(Boolean);
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
+
+      // Top of page
+      if (window.scrollY < 100) {
+        setActiveSection("top");
+        return;
+      }
+
+      // Reached bottom of page
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60) {
+        setActiveSection("contact");
+        return;
+      }
+
+      // Scroll spy: check which section is in view
+      const offset = 140;
+      let current = sectionIds[0] || "top";
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= offset) {
+            current = id;
+          }
+        }
+      }
+      setActiveSection(current);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [allNav]);
+
+  const isMoreNavActive = moreNav.some(
+    (item) => item.href.replace(/^#/, "") === activeSection
+  );
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -67,15 +102,15 @@ export default function Header({ onOpenDonate }) {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
+    <header className={`site-header ${scrolled || mobileMenuOpen ? "is-scrolled" : ""} ${mobileMenuOpen ? "is-menu-open" : ""}`}>
       {/* Main Header Bar */}
       <div className="header-main">
         <div className="wrap header-wrap">
           {/* Brand / Logo */}
-          <a href="#top" className="brand" aria-label="MAKAYA - Accueil">
+          <a href="#top" className="brand" aria-label={headerT.brandAria || "MAKAYA - Accueil"}>
             <img
               src={`${import.meta.env.BASE_URL}makaya-logo.png`}
-              alt="Logo MAKAYA"
+              alt={headerT.brandLogoAlt || "Logo MAKAYA"}
               className="brand-mark-img"
               width="135"
               height="44"
@@ -84,22 +119,26 @@ export default function Header({ onOpenDonate }) {
 
           {/* Desktop Navigation matching the mockup */}
           <nav className="main-nav" aria-label="Navigation principale">
-            {primaryNav.map((item, idx) => (
-              <a
-                key={`${item.label}-${item.href}`}
-                href={item.href}
-                className={`nav-link ${idx === 0 ? "active" : ""}`}
-              >
-                {item.label}
-              </a>
-            ))}
+            {primaryNav.map((item) => {
+              const sectionId = item.href.replace(/^#/, "");
+              const isActive = activeSection === sectionId;
+              return (
+                <a
+                  key={`${item.label}-${item.href}`}
+                  href={item.href}
+                  className={`nav-link ${isActive ? "active" : ""}`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
 
             {/* Dropdown for extra links */}
             {moreNav.length > 0 && (
               <div className="nav-dropdown" ref={dropdownRef}>
                 <button
                   type="button"
-                  className={`nav-link nav-dropdown-btn ${dropdownOpen ? "active" : ""}`}
+                  className={`nav-link nav-dropdown-btn ${dropdownOpen ? "open" : ""} ${isMoreNavActive ? "active" : ""}`}
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   aria-expanded={dropdownOpen}
                   aria-haspopup="true"
@@ -112,17 +151,21 @@ export default function Header({ onOpenDonate }) {
 
                 {dropdownOpen && (
                   <div className="dropdown-menu" role="menu">
-                    {moreNav.map((item) => (
-                      <a
-                        key={`${item.label}-${item.href}`}
-                        href={item.href}
-                        role="menuitem"
-                        className="dropdown-item"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        {item.label}
-                      </a>
-                    ))}
+                    {moreNav.map((item) => {
+                      const sectionId = item.href.replace(/^#/, "");
+                      const isActive = activeSection === sectionId;
+                      return (
+                        <a
+                          key={`${item.label}-${item.href}`}
+                          href={item.href}
+                          role="menuitem"
+                          className={`dropdown-item ${isActive ? "active" : ""}`}
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          {item.label}
+                        </a>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -132,7 +175,7 @@ export default function Header({ onOpenDonate }) {
           {/* Header Right Actions */}
           <div className="header-actions">
             {/* Search Icon Trigger */}
-            <a href="#programmes" className="header-search-btn" aria-label="Rechercher">
+            <a href="#programmes" className="header-search-btn" aria-label={headerT.searchAria || "Rechercher"}>
               <span className="material-symbols-rounded">search</span>
             </a>
 
@@ -184,6 +227,7 @@ export default function Header({ onOpenDonate }) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? headerT.closeMenuAria : headerT.menuAria}
               aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-panel"
             >
               <span className="material-symbols-rounded" aria-hidden="true">
                 {mobileMenuOpen ? "close" : "menu"}
@@ -193,94 +237,77 @@ export default function Header({ onOpenDonate }) {
         </div>
       </div>
 
-      {/* Mobile Drawer & Overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="mobile-overlay"
-          onClick={closeMobileMenu}
-          aria-hidden="true"
-        />
-      )}
-
+      {/* Mobile Menu Dropdown ("déroule normalement sur toute la page") */}
       <div
-        className={`mobile-drawer ${mobileMenuOpen ? "is-open" : ""}`}
+        id="mobile-nav-panel"
+        className={`mobile-menu-dropdown ${mobileMenuOpen ? "is-open" : ""}`}
         aria-hidden={!mobileMenuOpen}
       >
-        <div className="mobile-drawer-header">
-          <a href="#top" className="brand" onClick={closeMobileMenu}>
-            <img
-              src={`${import.meta.env.BASE_URL}makaya-logo.png`}
-              alt="Logo MAKAYA"
-              className="brand-mark-img mobile-brand-img"
-            />
-          </a>
-          <button
-            type="button"
-            className="mobile-drawer-close"
-            onClick={closeMobileMenu}
-            aria-label={headerT.closeMenuAria}
-          >
-            <span className="material-symbols-rounded" aria-hidden="true">close</span>
-          </button>
-        </div>
+        <div className="mobile-menu-inner">
+          <nav className="mobile-nav" aria-label={headerT.menuAria || "Navigation mobile"}>
+            {allNav.map((item) => {
+              const sectionId = item.href.replace(/^#/, "");
+              const isActive = activeSection === sectionId;
+              return (
+                <a
+                  key={`mobile-${item.label}-${item.href}`}
+                  href={item.href}
+                  className={`mobile-nav-link ${isActive ? "active" : ""}`}
+                  onClick={closeMobileMenu}
+                >
+                  <span className="mobile-nav-text">{item.label}</span>
+                  <span className="material-symbols-rounded arrow-icon" aria-hidden="true">
+                    arrow_forward
+                  </span>
+                </a>
+              );
+            })}
+          </nav>
 
-        <nav className="mobile-nav" aria-label="Navigation mobile">
-          {allNav.map((item) => (
-            <a
-              key={`mobile-${item.label}-${item.href}`}
-              href={item.href}
-              className="mobile-nav-link"
-              onClick={closeMobileMenu}
-            >
-              <span>{item.label}</span>
-              <span className="material-symbols-rounded arrow-icon" aria-hidden="true">
-                arrow_forward_ios
-              </span>
-            </a>
-          ))}
-        </nav>
+          <div className="mobile-menu-footer">
+            {/* Mobile Language Switcher */}
+            <div className="mobile-lang-row">
+              <span className="mobile-lang-label">{headerT.langAria} :</span>
+              <div className="lang-switcher">
+                <button
+                  type="button"
+                  className={`lang-btn ${lang === "fr" ? "active" : ""}`}
+                  onClick={() => setLang("fr")}
+                  title="Français"
+                >
+                  FR
+                </button>
+                <button
+                  type="button"
+                  className={`lang-btn ${lang === "ht" ? "active" : ""}`}
+                  onClick={() => setLang("ht")}
+                  title="Kreyòl"
+                >
+                  HT
+                </button>
+                <button
+                  type="button"
+                  className={`lang-btn ${lang === "en" ? "active" : ""}`}
+                  onClick={() => setLang("en")}
+                  title="English"
+                >
+                  EN
+                </button>
+              </div>
+            </div>
 
-        <div className="mobile-drawer-footer">
-          {/* Mobile Language Switcher */}
-          <div className="mobile-lang-row">
-            <span className="mobile-lang-label">{headerT.langAria} :</span>
-            <div className="lang-switcher">
-              <button
-                type="button"
-                className={`lang-btn ${lang === "fr" ? "active" : ""}`}
-                onClick={() => setLang("fr")}
+            {/* Mobile Contact Quick Action */}
+            <div className="mobile-footer-actions">
+              <a
+                href="#contact"
+                className="mobile-footer-contact-btn"
+                onClick={closeMobileMenu}
               >
-                FR
-              </button>
-              <button
-                type="button"
-                className={`lang-btn ${lang === "ht" ? "active" : ""}`}
-                onClick={() => setLang("ht")}
-              >
-                Kreyòl
-              </button>
-              <button
-                type="button"
-                className={`lang-btn ${lang === "en" ? "active" : ""}`}
-                onClick={() => setLang("en")}
-              >
-                EN
-              </button>
+                <span className="material-symbols-rounded" aria-hidden="true">mail</span>
+                <span>{headerT.contactQuick || "Nous contacter"}</span>
+              </a>
             </div>
           </div>
-
-          {/* Mobile Donate CTA */}
-          <button
-            type="button"
-            className="donate-header-btn mobile-donate-btn"
-            onClick={() => {
-              closeMobileMenu();
-              onOpenDonate();
-            }}
-          >
-            <span className="material-symbols-rounded" aria-hidden="true">favorite</span>
-            <span>{t.hero.primaryCta}</span>
-          </button>
         </div>
       </div>
     </header>
